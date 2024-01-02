@@ -10,6 +10,7 @@ class Post(BaseModel):
 class PostResponse(Post):
     id: int
     created_at: datetime
+    owner_id: int
     
     class Config:
         from_attributes = True
@@ -29,8 +30,8 @@ class UserLogin(BaseModel):
     
 class Token(BaseModel):
     access_token: str
-    token_type: str
+    token_type: str 
 
 class TokenData(BaseModel):
-    id: str | None = None
+    id: int | None = None
     
