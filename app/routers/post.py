@@ -1,13 +1,17 @@
 from typing import List
 from fastapi import Depends, HTTPException, Response, status, APIRouter
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app import schemas, models, oauth2
+from sqlalchemy.sql.expression import func, select
+
 
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
 
-@router.get("/", response_model=List[schemas.PostResponse])
+# @router.get("/", response_model=List[schemas.PostVoteResponse])
+@router.get("/")
 def get_posts(
     limit: int | None = None,
     skip: int | None = None,
@@ -22,7 +26,45 @@ def get_posts(
         .offset(skip)
         .all()
     )
-    return posts
+
+    # subq = select(models.Vote.post_id).distinct().where(models.Vote.user_id == current_user.id)
+
+    results = (
+        db.query(models.Post, func.count(models.Vote.post_id).label("votes"))
+        .join(
+            models.Vote,
+            and_(
+                models.Vote.post_id == models.Post.id,
+                models.Vote.user_id == models.Post.owner_id,
+            ),
+            isouter=True,
+        )
+        .group_by(models.Post.id, models.Vote.post_id, models.Vote.user_id)
+        .all()
+    )
+
+    # stmt = (
+    #     select(models.Post.id, func.count(models.Vote.post_id).label("votes"))
+    #     .join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True)
+    #     .group_by(models.Post.id)
+    # )
+
+    # print(stmt)
+    # results = db.execute(statement=stmt)
+
+    # rows = results.fetchall()
+
+    # for row in rows:
+    #     print(row)
+
+    # results = (
+    #     db.query(models.Post, func.count(models.Vote.post_id).label("votes"))
+    #     .join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True)
+    #     .group_by(models.Post.id)
+    #     .all()
+    # )
+
+    return results
 
 
 @router.post(

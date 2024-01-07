@@ -48,5 +48,9 @@ class VoteCreate(BaseModel):
         return value
 
 
-class VoteResponse(BaseModel):
-    post: Post
+# class PostVoteResponse(Post):
+#     Post: Post
+#     votes: int
+
+#     class config:
+#         orm_mode = True
