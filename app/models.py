@@ -28,6 +28,7 @@ class Post(Base):
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     owner = relationship("User")
+    votes = relationship("Vote")
 
 
 class User(Base):
@@ -39,6 +40,8 @@ class User(Base):
     created_at = Column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )
+
+    phone_number: Mapped[str] = mapped_column(unique=True)
 
 
 class Vote(Base):
@@ -52,19 +55,19 @@ class Vote(Base):
     )
 
 
-class Student(Base):
-    __tablename__ = "students"
+# class Student(Base):
+#     __tablename__ = "students"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(nullable=False)
-    email: Mapped[str]
-    comments: Mapped[List["Comment"]] = relationship(back_populates="student")
+#     id: Mapped[int] = mapped_column(primary_key=True)
+#     name: Mapped[str] = mapped_column(nullable=False)
+#     email: Mapped[str]
+#     comments: Mapped[List["Comment"]] = relationship(back_populates="student")
 
 
-class Comment(Base):
-    __tablename__ = "comments"
+# class Comment(Base):
+#     __tablename__ = "comments"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    text: Mapped[str] = mapped_column(Text, nullable=False)
-    student_id: Mapped[int] = mapped_column(ForeignKey("students.id"), nullable=False)
-    student: Mapped["Student"] = relationship(back_populates="comments")
+#     id: Mapped[int] = mapped_column(primary_key=True)
+#     text: Mapped[str] = mapped_column(Text, nullable=False)
+#     student_id: Mapped[int] = mapped_column(ForeignKey("students.id"), nullable=False)
+#     student: Mapped["Student"] = relationship(back_populates="comments")
